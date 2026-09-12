@@ -1,0 +1,348 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:macro name="diffbot" params="prefix">
+
+<link name="base_link">
+
+</link>
+
+<link name="base_footprint_link">
+ 
+</link>
+
+<joint name="base_footprint_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="base_footprint_link"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+<link
+    name="chassis_link">
+    <inertial>
+      <origin
+        xyz="0.0389174741762723 -0.00010695448169605 0.0456998223925717"
+        rpy="0 0 0" />
+      <mass
+        value="0.49036077218794" />
+      <inertia
+        ixx="0.000640019217385609"
+        ixy="3.04740904361823E-08"
+        ixz="-2.3490518814748E-07"
+        iyy="0.000643386179807441"
+        iyz="-1.51509728092471E-08"
+        izz="0.00127278749726955" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.45 0.45 0.45 1.0" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="chassis_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0.0226269804325702"/>
+    <parent
+      link="base_link" />
+    <child
+      link="chassis_link" />
+  </joint>
+
+   <gazebo reference="base_link">
+        <material>Gazebo/White</material>
+    </gazebo>
+
+  <link
+    name="RightWheel_link">
+    <inertial>
+      <origin
+        xyz="-0.0001359 9.7669E-05 0.0052444"
+        rpy="0 0 0" />
+      <mass
+        value="0.015725" />
+      <inertia
+        ixx="2.8256E-06"
+        ixy="-6.1622E-11"
+        ixz="6.4368E-11"
+        iyy="2.8256E-06"
+        iyz="-4.6837E-11"
+        izz="4.8494E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/RightWheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.1 0.1 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.02254" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="RightWheel_joint"
+    type="continuous">
+    <origin
+      xyz="0.00013053 -0.088885 -2.7718E-05"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="RightWheel_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.1"
+      friction="0.1" />
+  </joint>
+
+  <gazebo reference="right_wheel_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <link
+    name="LeftWheel_link">
+    <inertial>
+      <origin
+        xyz="6.9385E-05 0.00015229 -0.0052444"
+        rpy="0 0 0" />
+      <mass
+        value="0.015725" />
+      <inertia
+        ixx="2.8256E-06"
+        ixy="4.9691E-11"
+        ixz="3.2577E-11"
+        iyy="2.8256E-06"
+        iyz="7.2634E-11"
+        izz="4.8494E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/LeftWheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.1 0.1 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.02254" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="LeftWheel_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00013087 0.089115 2.7789E-05"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="LeftWheel_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.1"
+      friction="0.1" />
+  </joint>
+
+  <gazebo reference="LeftWheel_joint">
+    <material>Gazebo/Black</material>
+    <!-- <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
+    <kp>1e6</kp>
+    <kd>1.0</kd> -->
+  </gazebo>
+
+  <link
+    name="caster_link">
+    <inertial>
+      <origin
+        xyz="-0.000478380567586895 -1.4408434812832E-06 0.00881376467628848"
+        rpy="0 0 0" />
+      <mass
+        value="0.00222717216450544" />
+      <inertia
+        ixx="6.00766454662992E-08"
+        ixy="-2.9539683398365E-10"
+        ixz="-6.04391496540719E-12"
+        iyy="4.31082186259606E-08"
+        iyz="-1.62107213981745E-11"
+        izz="7.43888541780171E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/caster_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.1 0.3 0.8 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/caster_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="caster_joint"
+    type="fixed">
+    <origin
+      xyz="0.0784233124160295 0.000115164519984938 -0.0226269804325702"
+      rpy="0 0 0" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="caster_link" />
+    <axis
+      xyz="0 0 0" />
+    <!-- <dynamics
+      damping="0"
+      friction="0.001" /> -->
+  </joint>
+
+  <gazebo reference="front_caster_link">
+    <material>Gazebo/Blue</material>
+    <!-- <mu1>0.0</mu1>
+    <mu2>0.0</mu2> -->
+  </gazebo>
+
+  <link
+    name="camera_link">
+    <inertial>
+      <origin
+        xyz="-0.00435747223047264 -1.66750492915507E-05 0.000135955797956389"
+        rpy="0 0 0" />
+      <mass
+        value="0.00121688155812858" />
+      <inertia
+        ixx="8.74888033185362E-08"
+        ixy="5.15737910065536E-13"
+        ixz="2.91296770576525E-09"
+        iyy="4.67783717220053E-08"
+        iyz="-1.94352280700047E-11"
+        izz="4.25056031105327E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/camera_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.1 0.8 0.1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sim_pkg/models/camera_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="camera_joint"
+    type="fixed">
+    <origin
+      xyz="0.102339634192356 0.000148612043552418 0.165914398073672"
+      rpy="0 0 0" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="camera_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <joint
+    name="camera_optical_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="camera_link" />
+    <child
+      link="camera_link_optical" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="camera_link_optical"></link>
+
+  <gazebo reference="camera_link">
+        <material>Gazebo/Green</material>
+    </gazebo>
+
+  </xacro:macro>
+</robot>
