@@ -11,11 +11,11 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'flask', 'requests'],
     zip_safe=True,
-    maintainer='Antor',
-    maintainer_email='antor@example.com',
-    description='ArUco marker detection and marker-following for the diffbot AGV',
+    maintainer='Antor Mondal',
+    maintainer_email='antor.mondal2002@gmail.com',
+    description='ArUco marker detection and marker-following of autonomous mobile robot',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
@@ -23,6 +23,7 @@ setup(
             'aruco_detector = aruco_follower.aruco_detector:main',
             'marker_follower = aruco_follower.marker_follower:main',
             'set_target_marker = aruco_follower.set_target_marker:main',
+            'web_target_commander = aruco_follower.web_target_commander:main',
         ],
     },
 )
