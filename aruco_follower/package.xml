@@ -3,8 +3,8 @@
 <package format="3">
   <name>aruco_follower</name>
   <version>0.0.1</version>
-  <description>ArUco marker detection and marker-following for the diffbot AGV</description>
-  <maintainer email="antor@example.com">Antor</maintainer>
+  <description>ArUco marker detection and marker-following of autonomous mobile robot</description>
+  <maintainer email="antor.mondal2002@gmail.com">Antor Mondal</maintainer>
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
