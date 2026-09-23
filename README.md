@@ -3,6 +3,7 @@
 A ROS 2 autonomous mobile robot system that detects, identifies, and visually tracks a user-selected ArUco marker, then follows it using closed-loop proportional visual servoing on a differential-drive platform — in simulation and on physical hardware.
 
 **Author:** Antor Mondal · Dept. of Mechatronics Engineering, Khulna University of Engineering & Technology (KUET)
+
 **Repository:** https://github.com/antorrrr/aruco_marker_tracking_and_following_ros2
 
 ---
