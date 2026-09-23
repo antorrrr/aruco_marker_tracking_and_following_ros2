@@ -14,5 +14,5 @@ The project combines:
 - Web-based natural-language marker selection
 - ROS 2 'Twist / TwistStamped' conversion
 
-1. Project Overview
+**1. Project Overview**
 
