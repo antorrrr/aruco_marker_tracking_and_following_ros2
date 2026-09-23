@@ -4,6 +4,8 @@ A ROS 2 autonomous mobile robot system that detects, identifies, and visually tr
 
 **Author:** Antor Mondal · Dept. of Mechatronics Engineering, Khulna University of Engineering & Technology (KUET)
 
+**Email:** antor.mondal2002@gmail.com mondal2131021@stud.kuet.ac.bd
+
 **Repository:** https://github.com/antorrrr/aruco_marker_tracking_and_following_ros2
 
 ---
