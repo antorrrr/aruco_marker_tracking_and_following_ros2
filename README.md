@@ -1,4 +1,4 @@
-# aruco_marker_tracking_and_following_ros2
+# ArUco Marker Tracking and Following with ROS 2
 A ROS 2-based autonomous mobile robot system for detecting, identifying, tracking, and following a selected ArUco marker using computer vision.
 
 The project combines:
@@ -15,4 +15,6 @@ The project combines:
 - ROS 2 'Twist / TwistStamped' conversion
 
 **1. Project Overview**
-
+The system is designed around a camera-mounted differential-drive mobile robot.
+The basic operation is:
+Camera │ ▼ ArUco Detector │ ├── Marker ID ├── Marker Pose ├── Distance └── Detection Status │ ▼ Marker Follower │ └── TwistStamped velocity command │ ▼ twist_mux │ ▼ Differential Drive Controller │ ▼ Robot Hardware │ ▼ Arduino / Motors
