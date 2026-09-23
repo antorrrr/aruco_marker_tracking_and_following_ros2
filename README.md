@@ -11,3 +11,8 @@ The project combines:
 - Serial communication with an Arduino-based motor controller
 - Gazebo Sim warehouse simulation
 - 'twist_mux' for command arbitration
+- Web-based natural-language marker selection
+- ROS 2 'Twist / TwistStamped' conversion
+
+1. Project Overview
+
