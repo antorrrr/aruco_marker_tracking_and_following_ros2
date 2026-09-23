@@ -17,4 +17,26 @@ The project combines:
 **1. Project Overview**
 The system is designed around a camera-mounted differential-drive mobile robot.
 The basic operation is:
-Camera │ ▼ ArUco Detector │ ├── Marker ID ├── Marker Pose ├── Distance └── Detection Status │ ▼ Marker Follower │ └── TwistStamped velocity command │ ▼ twist_mux │ ▼ Differential Drive Controller │ ▼ Robot Hardware │ ▼ Arduino / Motors
+Camera 
+  │
+  ▼
+ArUco Detector
+  │
+  ├── Marker ID
+  ├── Marker Pose
+  ├── Distance
+  └── Detection Status
+  │
+  ▼
+Marker Follower
+  │
+  └── TwistStamped velocity command
+           │
+           ▼
+        twist_mux
+           │
+           ▼
+   Differential Drive Controller
+           │
+           ▼
+  
