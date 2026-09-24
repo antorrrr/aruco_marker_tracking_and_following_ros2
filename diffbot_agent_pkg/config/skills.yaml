@@ -1,0 +1,119 @@
+# skills.yaml
+#
+# Skill library for the diffbot LLM agent.
+# This file is the single source of truth for what the robot can do:
+#   - It's rendered into the LLM system prompt so Gemini only ever proposes
+#     skills that actually exist, with the right parameter names/types.
+#   - The agent node validates the LLM's JSON output against this file
+#     before dispatching anything to hardware (bounds-checking, type-checking).
+#
+# Velocity bounds below match diffbot_controllers.yaml's diff_drive_controller
+# limits (linear.x max 0.2 m/s, angular.z max 0.5 rad/s) — do not raise these
+# here without raising them there too, or commands will be silently clamped
+# by the controller and behave unexpectedly.
+
+skills:
+
+  - name: move_forward_distance
+    description: "Drive the robot straight forward a given distance."
+    params:
+      - name: distance_m
+        type: float
+        min: 0.05
+        max: 3.0
+        unit: meters
+      - name: speed_mps
+        type: float
+        min: 0.05
+        max: 0.2
+        unit: meters/second
+        default: 0.15
+    interface:
+      type: topic
+      topic: /cmd_vel_llm
+      msg_type: geometry_msgs/msg/TwistStamped
+    safety_notes: "Executed as a timed open-loop drive: duration = distance_m / speed_mps."
+
+  - name: move_backward_distance
+    description: "Drive the robot straight backward a given distance."
+    params:
+      - name: distance_m
+        type: float
+        min: 0.05
+        max: 3.0
+        unit: meters
+      - name: speed_mps
+        type: float
+        min: 0.05
+        max: 0.2
+        unit: meters/second
+        default: 0.15
+    interface:
+      type: topic
+      topic: /cmd_vel_llm
+      msg_type: geometry_msgs/msg/TwistStamped
+    safety_notes: "Same timed open-loop approach as move_forward_distance, reversed."
+
+  - name: rotate_angle
+    description: "Rotate the robot in place by a given angle. Positive = counterclockwise (left), negative = clockwise (right)."
+    params:
+      - name: angle_deg
+        type: float
+        min: -360.0
+        max: 360.0
+        unit: degrees
+      - name: angular_speed_dps
+        type: float
+        min: 5.0
+        max: 28.0
+        unit: degrees/second
+        default: 15.0
+    interface:
+      type: topic
+      topic: /cmd_vel_llm
+      msg_type: geometry_msgs/msg/TwistStamped
+    safety_notes: "angular_speed_dps capped below the 0.5 rad/s (~28.6 deg/s) controller limit."
+
+  - name: stop_robot
+    description: "Immediately stop all robot motion. Use for normal 'stop'/'halt' requests."
+    params: []
+    interface:
+      type: topic
+      topic: /cmd_vel_llm
+      msg_type: geometry_msgs/msg/TwistStamped
+    safety_notes: "Publishes a single zero-velocity message. Not the emergency path — see emergency_stop."
+
+  - name: emergency_stop
+    description: "Panic stop. Used for safety-critical halts, bypasses normal command queue."
+    params: []
+    interface:
+      type: topic
+      topic: /diffbot/web_emergency
+      msg_type: std_msgs/msg/Empty
+    safety_notes: "Agent must treat this with top priority and interrupt any in-progress skill immediately."
+
+  - name: capture_snapshot
+    description: "Capture the current camera frame and send it to the web UI. No analysis, just the image."
+    params: []
+    interface:
+      type: service_or_internal
+      source_topic: /camera/image_raw
+      publish_topic: /diffbot/web_image
+    safety_notes: "Read-only, no motion involved."
+
+  - name: describe_scene
+    description: "Capture the current camera frame and return a natural-language description of what the robot sees."
+    params: []
+    interface:
+      type: service_or_internal
+      source_topic: /camera/image_raw
+      publish_topic: /diffbot/web_response
+    safety_notes: "Read-only, no motion involved. Calls the Gemini vision endpoint — has network latency."
+
+  - name: get_status
+    description: "Report the robot's current state (idle/executing a skill, last skill run, connection health)."
+    params: []
+    interface:
+      type: topic
+      publish_topic: /diffbot/web_status
+    safety_notes: "Read-only."
