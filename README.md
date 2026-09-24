@@ -4,7 +4,7 @@ A ROS 2 autonomous mobile robot system that detects, identifies, and visually tr
 
 **Author:** Antor Mondal · Dept. of Mechatronics Engineering, Khulna University of Engineering & Technology (KUET)
 
-**Email:** antor.mondal2002@gmail.com mondal2131021@stud.kuet.ac.bd
+**Email:** antor.mondal2002@gmail.com · mondal2131021@stud.kuet.ac.bd
 
 **Repository:** https://github.com/antorrrr/aruco_marker_tracking_and_following_ros2
 
@@ -47,24 +47,139 @@ The currently selected marker is drawn in **green** in the debug image; every ot
 
 ---
 
+## Physical Robot Hardware and Software
+
+The following configuration describes the **physical robot setup** used with this repository. The software stack runs onboard a Raspberry Pi and communicates with an Arduino-based motor controller over USB serial.
+
+### Onboard Computer
+
+| Component | Configuration |
+|---|---|
+| Computer | Raspberry Pi 5 |
+| Operating System | Ubuntu 24.04 LTS |
+| ROS 2 | ROS 2 Jazzy Jalisco |
+| Robot middleware | ROS 2 + `ros2_control` |
+
+### Sensors and Actuators
+
+| Component | Hardware / Configuration |
+|---|---|
+| Vision sensor | USB camera accessed through `v4l2_camera` / `camera_ros` |
+| Camera resolution | 640 × 480 |
+| Camera frame | `camera_link_optical` |
+| 2D LiDAR | RPLiDAR A2M8 |
+| Wheel feedback | Encoder-equipped N20 DC gear motors |
+| Drive | Differential drive, two independently controlled wheels |
+| Motor driver | L298N |
+| Motor controller | Arduino Nano |
+| ROS 2 ↔ motor-controller link | USB serial |
+| Serial device | `/dev/ttyUSB0` |
+| Serial baud rate | 57600 |
+| Hardware update loop | 30 Hz |
+
+The custom `robot_control_pkg/RobotControlHardware` plugin sends wheel velocity commands to the Arduino and reads encoder feedback back from it. The Arduino-side motor control uses PID parameters configured from the ROS 2 hardware interface. The repository currently contains the ROS 2 side of this interface; the Arduino firmware itself is not included in this repository.
+
+### Camera Topics
+
+The ArUco detector expects the physical camera to provide:
+
+```text
+/camera/image_raw       sensor_msgs/msg/Image
+/camera/camera_info     sensor_msgs/msg/CameraInfo
+```
+
+The camera launch configuration uses **640 × 480** resolution and the `camera_link_optical` frame. The image stream is consumed by `aruco_detector`, while `CameraInfo` provides the calibrated camera intrinsics required for marker pose estimation.
+
+### ArUco Perception Topics
+
+```text
+/aruco/target_marker_id   std_msgs/msg/Int32
+/aruco/marker_pose        geometry_msgs/msg/PoseStamped
+/aruco/distance           std_msgs/msg/Float32
+/aruco/detected           std_msgs/msg/Bool
+/aruco/debug_image        sensor_msgs/msg/Image
+```
+
+`/aruco/debug_image` is the annotated camera stream: the selected target marker is highlighted in green and other detected markers are highlighted in red.
+
+### Velocity and Odometry Topics
+
+The marker follower publishes a stamped velocity command to:
+
+```text
+/cmd_vel_nav_stamped     geometry_msgs/msg/TwistStamped
+```
+
+This command is received by `twist_mux`. Joystick commands can enter through `/cmd_vel_joy`; the selected output is remapped to the differential-drive controller:
+
+```text
+/cmd_vel_nav_stamped → twist_mux → diff_controller/cmd_vel
+```
+
+The differential-drive controller is configured to use:
+
+```text
+odom_frame_id: odom
+base_frame_id: base_link
+```
+
+and publishes the robot odometry on:
+
+```text
+/odom                    nav_msgs/msg/Odometry
+/joint_states            sensor_msgs/msg/JointState
+```
+
+The hardware interface obtains wheel position and velocity from the Arduino encoder feedback; `diff_drive_controller` uses these wheel states to maintain the robot odometry.
+
+### LiDAR Topic
+
+The physical launch file starts the RPLiDAR A2M8 driver using its standard launch file. The expected scan topic is:
+
+```text
+/scan                    sensor_msgs/msg/LaserScan
+```
+
+### Hardware Communication Parameters
+
+The current ROS 2 hardware configuration contains:
+
+```text
+Serial device:       /dev/ttyUSB0
+Baud rate:            57600
+Timeout:              1000 ms
+Encoder counts/rev:  5903
+Hardware loop rate:  30 Hz
+PID P:                2.55
+PID I:                2.15
+PID D:                0.35
+```
+
+These are the values currently configured in `diffbot.ros2_control.xacro` for this specific build; see [Hardware Interface](#hardware-interface) below for how the hardware plugin uses them.
+
+The Arduino Nano firmware itself is not included in this repository — only the ROS 2–side hardware interface that communicates with it over serial.
+
+---
+
 ## Table of Contents
 
-1. [Repository Structure](#repository-structure)
-2. [Packages](#packages)
-3. [Perception: `aruco_detector`](#perception-aruco_detector)
-4. [Control: `marker_follower`](#control-marker_follower)
-5. [Target Selection](#target-selection)
-6. [Hardware Interface](#hardware-interface)
-7. [Simulation](#simulation)
-8. [ROS 2 Topic Interface](#ros-2-topic-interface)
-9. [Installation](#installation)
-10. [Running the System](#running-the-system)
-11. [Configuration Reference](#configuration-reference)
-12. [Safety Behavior](#safety-behavior)
-13. [Troubleshooting](#troubleshooting)
-14. [Requirements](#requirements)
-15. [Development Notes](#development-notes)
-16. [License](#license)
+1. [Physical Robot Hardware and Software](#physical-robot-hardware-and-software)
+2. [Repository Structure](#repository-structure)
+3. [Packages](#packages)
+4. [Perception: `aruco_detector`](#perception-aruco_detector)
+5. [Control: `marker_follower`](#control-marker_follower)
+6. [Target Selection](#target-selection)
+7. [Hardware Interface](#hardware-interface)
+8. [Simulation](#simulation)
+9. [ROS 2 Topic Interface](#ros-2-topic-interface)
+10. [Installation](#installation)
+11. [Running the System](#running-the-system)
+12. [Configuration Reference](#configuration-reference)
+13. [Safety Behavior](#safety-behavior)
+14. [Troubleshooting](#troubleshooting)
+15. [Requirements](#requirements)
+16. [Development Notes](#development-notes)
+17. [License](#license)
 
 ---
 
@@ -152,10 +267,10 @@ aruco_marker_tracking_and_following_ros2/
 **Publishes:**
 
 ```text
-/aruco/marker_pose         (geometry_msgs/PoseStamped)
-/aruco/distance             (std_msgs/Float32)
-/aruco/detected              (std_msgs/Bool)
-/aruco/debug_image          (sensor_msgs/Image)
+/aruco/marker_pose      (geometry_msgs/PoseStamped)
+/aruco/distance         (std_msgs/Float32)
+/aruco/detected         (std_msgs/Bool)
+/aruco/debug_image      (sensor_msgs/Image)
 ```
 
 **Pipeline:**
