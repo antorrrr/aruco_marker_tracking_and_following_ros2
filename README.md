@@ -55,7 +55,7 @@ The following configuration describes the **physical robot setup** used with thi
 
 | Component | Configuration |
 |---|---|
-| Computer | Raspberry Pi 5 |
+| Computer | Raspberry Pi 5 | RAM 8GB |
 | Operating System | Ubuntu 24.04 LTS |
 | ROS 2 | ROS 2 Jazzy Jalisco |
 | Robot middleware | ROS 2 + `ros2_control` |
@@ -67,7 +67,6 @@ The following configuration describes the **physical robot setup** used with thi
 | Vision sensor | USB camera accessed through `v4l2_camera` / `camera_ros` |
 | Camera resolution | 640 × 480 |
 | Camera frame | `camera_link_optical` |
-| 2D LiDAR | RPLiDAR A2M8 |
 | Wheel feedback | Encoder-equipped N20 DC gear motors |
 | Drive | Differential drive, two independently controlled wheels |
 | Motor driver | L298N |
