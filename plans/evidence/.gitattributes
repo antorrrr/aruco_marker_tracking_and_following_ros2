@@ -1,0 +1,2 @@
+# Preserve the supplied inventory bytes and its recorded SHA-256 on every checkout.
+robot-inventory-2026-09-25.txt -text
