@@ -2,7 +2,11 @@
 
 This is the executable runbook **to be completed and rehearsed by P04/P13**, not a claim that proposed packages exist now. Stage A commands are read-only inventory commands for the actual Linux robot. Later stages become valid only at their owning PR's exit. Never paste these into the Windows planning shell. Do not substitute the thesis's old Humble environment for the running robot without verification.
 
+Version 1.0 platform is fixed by the [reconciled inventory](robot-inventory-reconciled.md): Pi 5/8 GB, Ubuntu 24.04.4 aarch64, Jazzy/Python 3.12.3, camera_ros/libcamera CSI Camera Module 3. Use its package-version table and retained raw report as the dependency starting point. Production domain is 42; doctor summary reports Fast DDS despite unset RMW environment. `/diff_controller/cmd_vel` is TwistStamped, `/diff_controller/odom` is Odometry, `/camera/image_raw` and `/camera/camera_info` are Image/CameraInfo. Recorded camera mode is 640×480, frame `camera_link_optical`, roughly 29 Hz at the ROS observer. Camera calibration provenance, serial baud and actual startup procedure remain G1/G2.
+
 ## Stage A — Inventory now
+
+Initial inventory is complete enough to select the platform. Run the targeted follow-up in `robot-inventory-reconciled.md` for missing source/configuration/firmware/extra-node facts. The full list below is retained for future clean-machine baseline comparison; do not repeat completed work unnecessarily.
 
 Have the maintainer disable motor power/enable using the actual established method; do not guess a service or GPIO. Keep the physical operator present. Save outputs with timestamps and redact host/user identifiers in public copies. If the robot is already running, inventory it without starting a second driver/controller. `timeout` ends observation, not the underlying robot node.
 
@@ -38,13 +42,16 @@ Missing tools/topics are inventory findings, not permission to install or invent
 
 ## Stage B — Clean supported checkout (P04/P13)
 
-P01 sets actual OS/ROS/architecture and verified remote/release. P04 supplies `requirements-*.lock`, package manifests and install guide; the variables below must be filled from the release manifest, not guessed. Use separate clean robot storage/workspace to prove no hidden dependency. System ROS Python libraries must remain compatible with cv_bridge/OpenCV/rclpy; do not use `pip --break-system-packages`.
+P01 closes running-source/firmware provenance; OS/ROS/architecture are already selected. P04 supplies `requirements-*.lock`, package manifests and install guide. The release SHA below must be a later reviewed implementation release, not the documentation-only blueprint commit. Use separate clean storage/workspace to prove no hidden dependency. System ROS Python libraries must remain compatible with cv_bridge/OpenCV/rclpy; do not use `pip --break-system-packages`. Run integration/fault tests on a verified isolated ROS domain or test host; never run them against the existing live domain 42.
 
 ```bash
 # Fill from the verified release manifest before running.
-ROS_RELEASE='<verified ROS distro>'
-SOURCE_URL='<owner-approved repository URL>'
-RELEASE_SHA='<reviewed full commit SHA>'
+ROS_RELEASE='jazzy'
+SOURCE_URL='https://github.com/antorrrr/aruco_marker_tracking_and_following_ros2.git'
+RELEASE_SHA='<qualified implementation release full SHA>'
+# Fill with a domain verified unused by the physical robot before integration tests.
+export ROS_DOMAIN_ID='<verified isolated test domain>'
+export RMW_IMPLEMENTATION='rmw_fastrtps_cpp'
 WS="$HOME/robot_ws"
 REPO="$WS/src/aruco_marker_tracking_and_following_ros2"
 source "/opt/ros/$ROS_RELEASE/setup.bash"
@@ -75,6 +82,8 @@ Before cloning into an existing workspace, inventory it and select a new workspa
 
 `config/robot.example.yaml` defines topics/types, serial device/baud, wheel geometry/encoder conversion, camera driver/index/calibration, sensor frames, robot namespace/domain and environment profile. Junior copies to a local ignored `config/robot.yaml` and fills verified values. `config/safety.yaml` and `skills.yaml` are reviewed versioned policies, never browser-editable. `config/provider.example.yaml` holds provider/model ID, deadlines, output cap, per-run/daily budget and offline policy without secret values. `config/vision.yaml` holds frame size/FPS/age, privacy and caption deadlines. All nonsecret effective configs are hashed into each run manifest.
 
+Populate known deployment defaults: production domain 42, Fast DDS, camera_ros/libcamera, image/CameraInfo names above, optical frame and 640×480, controller `diff_controller`, joints `LeftWheel_joint`/`RightWheel_joint`, configured radius/separation 0.021/0.134 m, by-id CH340 device. Mark baud, firmware identity, calibration-file path, marker dictionary/physical size and obstacle sensor configuration as required unknowns until G1/G2/G4 close; startup must reject an armed profile with these gaps. Existing 1.0-s controller timeout and ±0.2/±0.5 limits are baseline settings, not measured safety bounds. Do not indiscriminately replace optional `.nan` controller parameters: verify their installed semantics and set explicit qualified braking policy later. `publish_limited_velocity=false` requires P03/P06 instrumentation work for motor-output evidence.
+
 Store API key in a private owner-readable environment file outside the checkout (e.g. `~/.config/thesis-robot/provider.env`, mode 600), or the platform credential mechanism. Do not echo it, use URL query parameters, place it in shell history, browser code, bags or screenshots. Supply it only to the translator/vision process; safety/controller processes need no cloud credentials. `.gitignore`, artifact redaction and bundle scanning must cover local secret/config/log files. Junior verifies **presence**, not contents. Rotate any previously exposed key through its provider, outside this blueprint's scope.
 
 Use an unprivileged service account with only needed serial/video device access; stable `/dev/serial/by-id` or narrowly scoped udev mapping prevents motor/lidar port swaps. Confirm group membership and reboot/login effect; avoid mode 777 devices. Keep controller DDS and any legacy rosbridge inaccessible to untrusted LAN clients; no generic web publish/service capability. Authenticated gateway may be bound to the protected LAN with HTTPS/session setup documented. Physical control remains local. Document firewall rules and restore commands in the platform-specific runbook.
@@ -82,6 +91,8 @@ Use an unprivileged service account with only needed serial/video device access;
 ## Stage C — Launch order (P04/P06–P11)
 
 Proposed entrypoint: `ros2 launch robot_bringup system.launch.py profile:=robot robot_config:=<absolute-path> armed:=false`. P04 provides the entrypoint; P06–P11 add components. It must validate dependencies and refuse to arm if required checks fail. Junior should never need to launch sia-bot, ROSA, OpenRouter or a second motor driver.
+
+Before starting this entrypoint on production domain 42, the maintainer must use the captured shutdown procedure to stop the old controller/mux/follower stack with motors independently disabled; verify no competing publishers or serial-device owners remain. Only then set `ROS_DOMAIN_ID=42` and `RMW_IMPLEMENTATION=rmw_fastrtps_cpp`. A separate checkout does not isolate ROS or serial hardware. Rehearse on test storage/domain first. The currently observed `/scan` absence means inspection can start disarmed, but floor research remains blocked until P05b/P06/P13 establish real sensing and qualification.
 
 1. Motor enable remains off. Verify E-stop availability and firmware watchdog/configuration.
 2. Load state publisher and hardware controller in a safe inactive/zero state; start validated encoder/sensor interfaces. Check odometry/TF and required sensor freshness.

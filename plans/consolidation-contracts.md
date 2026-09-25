@@ -2,6 +2,8 @@
 
 P02 freezes these contracts after P01 inventory. Numeric values below are **initial bench proposals**, not certified limits or measured stop performance. Hardware qualification can lower limits; changes before confirmatory collection are versioned and justified.
 
+The 2026-09-25 report establishes the deployed Pi 5/Jazzy topic/controller baseline in `robot-inventory-reconciled.md`. It records a 1.0-s ROS controller timeout but no firmware watchdog evidence and no active `/scan`; proposed shorter timeouts are future requirements. P05b supplies a real clearance source, P06 enforces it, and P13 measures stopping bounds. P02 also owns the clearance contract consumed by P05b/P06: sensor/source ID, source timestamp and sequence/boot, frame, directional covered region, range plus uncertainty, and explicit valid/unknown/stale state. Sensor absence or uncovered swept footprint denies motion; captions cannot fill that gap. Optional NaN parameter defaults in the controller dump are not the same thing as accepting NaN runtime commands or sensor data.
+
 ## Intent boundary
 
 Browser request envelope, issued by the authenticated gateway: schema version, server-assigned `command_id`, `session_id`, `boot_id`, local monotonic receive time, expiry, operator lease/generation, UTF-8 command text, and bounded context reference. Model cannot set identity, timestamps, expiry, safety limits, topic names, lease, or authorization.

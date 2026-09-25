@@ -2,6 +2,8 @@
 
 Read `consolidation-blueprint.md` for decisions/dependencies and `consolidation-source-audit.md` for verified baseline. All work is future work. Each package is a reviewable PR; evidence collection PRs contain protocol-linked manifests/results, not uncontrolled large media files. Original/raw evidence goes into a backed-up immutable store with hashes and resolvable locations. Do not create a PR that also performs an unrelated cleanup.
 
+Version 1.0 uses [the reconciled robot report](robot-inventory-reconciled.md): Pi 5/8 GB, Ubuntu 24.04.4 ARM64/Jazzy, camera_ros CSI camera, stamped motor input, odometry, no active scan evidenced. G1–G7 identify evidence and responsible roles for remaining unknowns. No PR is marked implemented by blueprint finalization. There are 20 packages; P05b is new because obstacle sensing is not established.
+
 ## Shared execution rules
 
 Cold start for **every** PR: read its brief below, the named contract/protocol and predecessor exit manifests; inspect current `AGENTS.md`, `git status --short`, `git log -5 --oneline`, dependency versions and actual files. Stop on unexplained source drift. Never use a stale blueprint path as proof that a file exists. After P01 establishes history, branch from the verified integration head; submit a bounded PR and retain its URL/hash. Until a remote is available, use local commits/patches with the same review gates. Do not push or publish participant data.
@@ -12,13 +14,13 @@ Rollback for any code change: stop/disarm with the local operator, verify halt, 
 
 ## P01 — Preserve baseline and establish actual platform (1–2 days)
 
-**Cold-start brief:** The supplied ArUco folder is the deployment target, but both local folders lack `.git`. README Jazzy and thesis Humble conflict; firmware, sensors and E-stop are unverified. This PR is inventory/provenance only, no changes to motor behavior. Strongest review recommended.
+**Cold-start brief:** Platform inventory is received: target Pi 5/Jazzy, not thesis Pi 4/Humble. The PR checkout has Git history; the live package source revision does not. Git commands failed at `~/amr_robot`, not necessarily its package repositories. This package closes provenance/configuration gaps only; physical watchdog/stop/sensing validation belongs to P05/P05b/P06/P13. Strongest review recommended.
 
 **Components:** new `docs/hardware-inventory.md`, `docs/decisions.md`, `research/provenance/source-manifest.json`, `docs/licenses.md`, `.gitignore`; owner-approved source history; sibling `sia-bot` and thesis read-only inputs.
 
-**Tasks:** hash source snapshots and all eight test files; preserve independent backups; resolve D1/D2 and scope/D4/D5 answers without storing secrets. Capture live node/topic/type/QoS/publisher/parameter/package inventory, exact startup commands, robot computer/OS/RAM, wiring and camera calibration, firmware source/hash/build/flash procedure, sensors and test area. Diff running source against supplied copy. Confirm upstream ownership/license/attribution (target README author differs from thesis author), verified remote and default branch; import local changes without overwriting working hardware checkout. Archive original thesis and test requirements with access-controlled provenance. Record D8 grounding as a study decision to be finalized P12.
+**Tasks:** preserve submitted report and source hashes; complete G1/G2 using targeted follow-up, not another full inventory. Resolve actual package repos/installed overlay paths, launch/service sequence, camera_ros calibration/parameters, marker dictionary/physical size, Nano sketch/binary/baud/build tooling and restore instructions. Inspect `/diffbot`, `/cmd_vel_emergency` and complete raw graph; reconcile report summary contradictions. Diff running source against supplied copy and confirmed upstream main. Preserve backup and third-party attribution; report mentions upstream firmware URL but not installed hash. Record physical-safety/sensor unknowns as G3/G4 follow-ups and study/provider choices as G6/G7; P01 does not wait for completed experiments or institutional approval. Record D8 grounding for P12a.
 
-**Verify:** inventory commands in deployment Stage A; `git status --short`; `git remote -v`; `git symbolic-ref refs/remotes/origin/HEAD` only if a remote is configured; `sha256sum` on files and backup samples. Recheck `gh auth status` only when publication is needed; current authentication is invalid.
+**Verify:** targeted commands in `robot-inventory-reconciled.md`; package-directory `git status --short`/`git rev-parse HEAD`; installed prefixes and file hashes; `sha256sum` on backups. GitHub sign-in/fork/PR already succeeded for the blueprint; recheck only if later access fails. No initialization of the live workspace root just because it lacks `.git`.
 
 **Retain:** source SHA-256 manifest, inventory outputs, wiring/firmware/calibration evidence, known-working launch capture, decision log and backup restore record.
 
@@ -50,11 +52,11 @@ Rollback for any code change: stop/disarm with the local operator, verify halt, 
 
 ## P04 — Reproduce clean build and no-motion launch (2–4 days; P01)
 
-**Cold-start brief:** Existing launches/config are useful but not a reproducible deployment. Two camera drivers exist, manifests differ from actual imports, and simulation may fetch remote assets. Preserve the observed OS/ROS version.
+**Cold-start brief:** Target Ubuntu 24.04.4 aarch64/Jazzy with system Python 3.12.3, camera_ros 0.6.0/libcamera and OpenCV 4.6.0. Preserve the native ABI. Current launch/service commands are not supplied; P01 captures them. Existing camera_ros `cam_launch.py` is the selected adaptation reference. `real_robot_launch.py` unconditionally includes lidar, while the report shows no active `/scan`; make sensor startup explicit and inhibit motion when required sensing is unavailable.
 
 **Components:** existing `aruco_follower/{package.xml,setup.py}`, `robot_control_pkg/{package.xml,CMakeLists.txt,bringup/launch,bringup/config}`, `sim_pkg/{package.xml,setup.py,launch,config,worlds}`, `twist_stamper-main`; new `robot_bringup/`, `requirements-{runtime,dev}.lock`, `docs/deployment.md`, `config/robot.example.yaml`, `tools/doctor.py`, CI build configuration.
 
-**Tasks:** pin supported native dependency versions, resolve Flask/requests/OpenCV/serial/camera/mux dependencies; isolate test-only vs runtime requirements; preserve licenses. Make one selected camera path/config, stable serial device mapping, no-motion launch default, environment/secret templates. Add a simple cached local simulation world for deterministic CI; keep warehouse optional. Define service startup/shutdown order. Do not auto-arm. Clean build from separate workspace with no sia-bot/Pixi/PYTHONPATH dependency.
+**Tasks:** capture/pin native package versions from report plus missing OS/Python/firmware dependencies and offline restore assets; resolve Flask/requests/OpenCV/serial/camera dependencies. Use camera_ros/libcamera CSI launch at observed 640×480, valid calibration and `camera_link_optical`; do not install pip OpenCV over the observed system cv_bridge stack. Profile domain 42/Fast DDS explicitly; keep simulated fault tests off live domain 42. Separate lidar/obstacle bringup selection from core hardware startup: `none` is allowed only for disarmed inspection/simulation, never clear-for-motion. Select by-id CH340 path after identity check; leave baud blocked until P01 confirms it. Add no-motion default and safe service restart, local cached simulation world, dependency/secret templates. Reproduce clean build with no sia-bot/Pixi dependency.
 
 **Verify:** deployment Stage B build; `ros2 launch robot_bringup system.launch.py --show-args`; `python3 tools/doctor.py --profile simulation --no-motion`; `colcon test --base-paths "$REPO"`; `colcon test-result --verbose`. Capture any missing actual launch executable as a failure.
 
@@ -62,17 +64,29 @@ Rollback for any code change: stop/disarm with the local operator, verify halt, 
 
 ## P05 — Independent physical stop and firmware/serial fail-stop (3–6 days; P01/P04)
 
-**Cold-start brief:** ROS controller timeout is not a hardware watchdog. Firmware is absent; C++ deactivate has no zero write and serial timeout parsing can accept invalid feedback. Strongest safety/hardware review; named operator present.
+**Cold-start brief:** Report identifies Arduino Nano/L298N with encoder motors and a 3200 mAh LiPo, but supply arrangement, E-stop and firmware watchdog are unknown. Reported ros_arduino_bridge URL and backup locations do not establish installed firmware contents. Observed ROS controller timeout is 1.0 s and is not a firmware watchdog. C++ deactivate has no zero write and serial timeout parsing can accept invalid feedback. Strongest safety/hardware review; named maintainer/operator present.
 
 **Components:** existing `robot_control_pkg/hardware/diffbot_system.cpp`, `hardware/include/robot_control_pkg/arduino_comms.hpp`; new `firmware/` containing retrieved compatible source/build lock, `docs/hardware-safety.md`, `tests/hardware_interface/`, `research/qualification/watchdog/`. If actual firmware is externally maintained, vendor a reviewed pinned source and attribution so the deployment can be reproduced.
 
-**Tasks:** document/install verified physical motor-enable interruption and deliberate reset; identify controller/driver behavior on power/serial loss. Bound serial reads, reject malformed/stale encoder replies, propagate errors, send zero on deactivate/error where possible, validate finite motor command conversions. Firmware requires command-age timeout independent of Linux and no movement after boot/reset. Preserve known-good firmware binary and exact flash/restore tooling. Split electrical modification into a separately reviewed hardware change if necessary; code PR cannot certify wiring.
+**Tasks:** before any powered motor bench check, establish an independently operable physical motor-disable path with the hardware reviewer and confirm a named operator can reach it. Then document/install verified physical motor-enable interruption and deliberate reset; identify controller/driver behavior on power/serial loss. Bound serial reads, reject malformed/stale encoder replies, propagate errors, send zero on deactivate/error where possible, validate finite motor command conversions. Firmware requires command-age timeout independent of Linux and no movement after boot/reset. Preserve known-good firmware binary and exact flash/restore tooling. Split electrical modification into a separately reviewed hardware change if necessary; code PR cannot certify wiring.
 
 **Verify:** `colcon test --packages-select robot_control_pkg`; `colcon test-result --verbose`; implement `python3 tools/qualify_safety.py --profile wheels-raised --case firmware-watchdog` and cases `physical-estop`, `serial-loss`, `controller-kill`. Operator follows inspected stop procedure; automated script never requests floor motion.
 
 **Retain:** firmware/build hashes, wiring photos/schematic, MCU timeout telemetry, external wheel-stop timing, controller fault logs. **Rollback:** motor disabled; named maintainer reflashes preserved verified image using documented tool; repeat watchdog/stop tests before any motion. If restore lacks safety, remain disabled. **Exit:** independent stop and firmware expiry demonstrated, reset does not restart motion; zero-write alone is insufficient.
 
-## P06 — Final velocity supervisor and leases (3–5 days; P02/P03/P04/P05)
+## P05b — Restore or integrate obstacle sensing (2–4 days; P01/P02/P04, G4)
+
+**Cold-start brief:** `/scan` was absent in the submitted robot graph; lidar hardware presence remains unknown. A launched or installed sensor package is not obstacle sensing. This PR provides a validated measurement path for P06, not navigation or proof of safe stopping.
+
+**Components:** new `robot_sensing/robot_sensing/{clearance.py,sensor_health.py}`, `config/obstacle.yaml`, `robot_bringup` sensor launch, `tests/sensing/`, `docs/sensor-coverage.md`; adapt existing `robot_control_pkg/bringup/launch/real_robot_launch.py` optional lidar include. P02 defines versioned clearance/status input for P06.
+
+**Tasks:** maintainer surveys fitted sensors. If a usable range device exists, capture model/driver/configuration and restore its measurement path while disarmed; if absent, document range/field-of-view/minimum-range/rate/mount/voltage constraints and get owner's hardware choice/budget before purchasing. Use measured geometry to select directional coverage; reverse/turn/arc unavailable unless swept footprint is covered. Integrate range plus timestamps/frame transforms, explicit valid/unknown/stale states, invalid/infinite/no-return handling according to selected device, and uncertainty margins. No caption-based clearance. Simulate missing/invalid data and use static targets to characterize distance/coverage while motors disabled. State minimum detection distance relative to the required 20 cm box fixture.
+
+**Verify:** `python3 -m pytest tests/sensing -q`; `ros2 topic info -v /scan` only if chosen device publishes LaserScan (otherwise its documented actual topic/type); `timeout 10 ros2 topic hz <configured_range_topic>`; implement `python3 tools/qualify_sensing.py --profile stationary --case all` for stale/disconnected/obstructed/invalid-data and static range fixtures. No moving test before P05/P06/P13 permissions.
+
+**Retain:** sensor identity/driver versions, mounting/coverage and minimum-range evidence, static fixture measurements, fault traces, topic contract and optional procurement decision. **Rollback:** disable sensor bringup, retain previous configurations and disarmed state; unavailability must inhibit motion. **Exit:** G4 measurement path and uncertainty/coverage established, missing data fails closed; no claim of full collision prevention. Measured braking/stop thresholds remain P13.
+
+## P06 — Final velocity supervisor and leases (3–5 days; P02/P03/P04/P05/P05b)
 
 **Cold-start brief:** Mux currently routes joystick/follower directly to controller; follower can keep publishing through Wi-Fi loss. Put a guard after all arbitration. Strongest review.
 

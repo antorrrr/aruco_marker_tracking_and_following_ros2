@@ -2,6 +2,8 @@
 
 Prepared 2026-09-25. Purpose: collect facts needed to finalize the consolidation blueprint. The owner is away from the robot and will supply your report later. **This is not deployment or permission to test movement.**
 
+Update 2026-09-26: the initial report has been received and incorporated into blueprint v1.0. This is now the retained original checklist. Continue with [targeted follow-up and G1–G7](robot-inventory-reconciled.md), especially actual package repositories under `~/amr_robot/src`, firmware/configuration/calibration and physical stop/sensor inspection. Do not repeat completed platform queries or treat the supplied report's conflicting final summary as authoritative.
+
 ## Boundaries
 
 - Keep the robot stationary. Use the maintainer's established motor-disable procedure if known; if unknown, report that and do not guess wiring, GPIOs, services or buttons.

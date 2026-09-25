@@ -2,6 +2,10 @@
 
 Inspected 2026-09-24. **C** = verified by static source inspection; **T** = thesis assertion; **U** = unverified hardware/runtime fact; **P** = proposed design. Static source inspection does not prove execution on the robot. Neither checkout has Git metadata. No build, ROS integration test, paid model call, or physical experiment was run in this phase.
 
+**2026-09-26 addendum:** The paragraph above and original map describe the initial source snapshots. A Git checkout and [PR #1](https://github.com/antorrrr/aruco_marker_tracking_and_following_ros2/pull/1) now exist in `aruco-pr-worktree`. **R** = reported robot observation from Antor's 2026-09-25 inventory, preserved in [raw evidence](evidence/robot-inventory-2026-09-25.txt) and interpreted in [reconciled baseline](robot-inventory-reconciled.md). R is not an independent live verification by this assistant. Raw report SHA-256: `741633c0f45f42e9c9b349f9651f0533af083eb1307a9de8304c99b3283ab46e`.
+
+R resolves the platform as Pi 5/8 GB, Ubuntu 24.04.4 ARM64, Jazzy/Python 3.12.3, domain 42 with reported Fast DDS, Camera Module 3 CSI via camera_ros/libcamera. It establishes the current stamped command and odometry endpoints, actual mux publisher, populated CameraInfo and short-window ROS camera rate. `/scan` is not active in the supplied graph. E-stop, firmware watchdog, source/firmware revision, calibrated geometry, safe test area and network-loss behavior remain unverified. The historical maps below remain useful code evidence; use the reconciled table for current deployment decisions. P05b adds the missing sensing integration gate. Git failure at the robot workspace root does not establish package-subdirectory Git state.
+
 ## Inputs inspected
 
 - Final thesis: `../Thesis Report Final 1931004.docx.pdf`, 44 PDF pages. Page numbers below are PDF file pages; printed body page = PDF page minus seven. Text was extracted across the document; the numerical results table on PDF p29 was also rendered and visually checked.
@@ -32,7 +36,7 @@ Inspected 2026-09-24. **C** = verified by static source inspection; **T** = thes
 
 ## Current topics and proposed ownership
 
-These are source-derived names; P01 must capture live type, QoS, publisher count, rates and timestamps. An entry in a launch/README is not proof of a running node.
+These were source-derived names at initial inspection. The reconciled report now supplies endpoint/QoS/parameter samples for controller/odom/camera; P01 closes missing source/launch and extra-node information. An entry in a launch/README alone is still not proof of a running node.
 
 | Current source endpoint | Type and source | Proposed treatment |
 |---|---|---|
