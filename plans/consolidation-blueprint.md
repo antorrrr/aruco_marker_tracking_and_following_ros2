@@ -65,7 +65,7 @@ Effort estimates are engineering person-days, including focused review/verificat
 
 | PR | Deliverable | Depends on | Estimate |
 |---|---|---|---|
-| P01 | Complete baseline source/firmware/configuration provenance | Received inventory; G1/G2 follow-up | 1–2 |
+| P01 | Complete baseline source/firmware/configuration provenance | Received inventory; G1/G2 follow-up | 2–4 |
 | P02 | Intent, skill, event, safety and topic contracts | P01 | 2–3 |
 | P03 | Correlated event recorder and data schemas | P02 | 2–3 |
 | P04 | Reproducible environment, clean build, no-motion launch | P01 | 2–4 |
@@ -86,7 +86,7 @@ Effort estimates are engineering person-days, including focused review/verificat
 | P17 | Publication evidence and claim audit | P14, P15, P16 | 2–4 |
 | P18 | Retire sia-bot deployment and preserve archive | P13, P17 | 1–2 |
 
-Total work-package estimate: **43–76 person-days**; allow roughly **48–84 person-days including integration contingency**, plus external waiting. A single developer should budget roughly 10–17 working weeks before external delays. The extra 2–4 days covers the now-explicit obstacle-sensing gap; sensor procurement and electrical work can extend elapsed time. These are estimates, not a delivery promise.
+Total work-package estimate: **44–78 person-days**; allow roughly **49–86 person-days including integration contingency**, plus external waiting. A single developer should budget roughly 10–18 working weeks before external delays. P01 now explicitly includes installed-payload comparison and offline restore evidence; sensor procurement and electrical work can extend elapsed time. These are estimates, not a delivery promise.
 
 ```mermaid
 flowchart LR
