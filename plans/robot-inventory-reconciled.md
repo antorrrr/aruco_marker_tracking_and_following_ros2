@@ -2,6 +2,8 @@
 
 Inventory collected by Antor on 2026-09-25; supplied by the owner on 2026-09-26. This is user-supplied observation, not an independent remote session or safety qualification. The complete [submitted report](evidence/robot-inventory-2026-09-25.txt) is retained unchanged, including its contradictory final summary. Source command blocks take precedence over that summary. `[cite: 1]` strings in the submission have no independently supplied citation target.
 
+**Follow-up received 2026-09-28:** [raw provenance and ROS output](evidence/robot-provenance-followup-2026-09-28.txt), SHA-256 `b2881f60325c7580cb47f9703ec1f58318726dac5821be469904ab2d7296fee3`. It adds package locations, source/install overlays, mux inputs/priorities, the camera calibration URL, and detector/follower configuration. This is user-supplied output, not independent live verification or a safety test. Its Git commands used the literal placeholder `<actual package repository directory from the inventory>` and did not test the located directories.
+
 ## Established deployment target
 
 | Item | Evidence from report | Blueprint decision |
@@ -23,6 +25,21 @@ Inventory collected by Antor on 2026-09-25; supplied by the owner on 2026-09-26.
 | Obstacles | Collector says `/scan` absent; hz command reports no publisher | No active LaserScan path evidenced. This does not prove lidar hardware absent; survey hardware and integrate a real clearance source in P05b. No obstacle-protection claim today. |
 | Other nodes/topics | Report lists detector, commander, follower, camera, mux, controllers, state publisher, and extra `/diffbot`; mentions `/cmd_vel_emergency` | Identify `/diffbot`, emergency topic type/publishers/consumers and all velocity paths. Name alone proves neither latched E-stop nor safe priority. Preserve graph before reconfiguration. |
 
+### Follow-up facts and interpretation
+
+| Evidence | Updated baseline / consequence |
+|---|---|
+| `colcon list` | Source workspace contains `aruco_follower`, `robot_control_pkg`, `sim_pkg`, `twist_stamper`, plus **`diffbot_agent`** at `src/diffbot_agent_pkg`, **`serial_motor_demo`** and **`serial_motor_demo_msgs`** in `src/serial_motor_demo`. The latter three are absent from the supplied Windows ArUco tree; P01 must audit their role and whether they are needed in the sole deployment repo. Package presence does not prove runtime activity. |
+| `ros2 pkg prefix` | ArUco follower and robot control resolve to `/home/pi/amr_robot/install/{aruco_follower,robot_control_pkg}`; camera_ros resolves to `/opt/ros/jazzy`. This shows overlay ownership in the reported snapshot, not commit identity or launch order. |
+| `/diffbot` node info | Only parameter and rosout interfaces appear; no motor/topic subscription or publication in this snapshot. Identify its executable/process without assigning behavior based on its name. |
+| `/twist_mux` info and parameters | Four stamped inputs: `/cmd_vel_emergency` priority 200, `/cmd_vel_joy` 100, `/cmd_vel_llm` 50, `/cmd_vel_nav_stamped` 10; each has a 0.5 s timeout. Output is `/diff_controller/cmd_vel` and diagnostics. This is arbitration, not authority validation or a persistent stop latch. `cmd_vel_llm` is configured in the running graph even though the copied ArUco README does not describe it. Identify every publisher and audit `diffbot_agent_pkg`. |
+| `ros2 topic info -v /cmd_vel_emergency` | One best-effort/volatile mux subscriber, **zero publishers** at observation. No software E-stop publisher is evidenced then; priority 200 cannot help without a publisher. Physical E-stop wiring and firmware watchdog remain unknown. |
+| Full topic list | Confirms raw **and compressed** camera topics, ArUco topics, four mux inputs, odometry and stamped controller input. `/scan` remains absent. Compressed transport existence does not prove browser consumption or caption behavior. |
+| `/camera` parameters | camera_ros configured 640×480, `camera_link_optical`, orientation parameter 0, JPEG quality 95 and `camera_info_url=file:///home/pi/amr_robot/install/robot_control_pkg/share/robot_control_pkg/config/camera_calibration.yaml`. The path is configured; file content, physical orientation, mode match and calibration accuracy remain unverified. Preserve and hash source and installed calibration files. |
+| `/aruco_detector` parameters | Active dictionary **`DICT_7X7_50`**, marker size configured **0.1 m**, image `/camera/image_raw`, info `/camera/camera_info`, target -1 at inspection, debug enabled. The copied detector default `DICT_5X5_100` is not the active profile. Measure the printed marker and confirm its dictionary before treating pose as metric evidence. |
+| `/marker_follower` parameters | 20 Hz, 0.5 m standoff, 0.5 s marker timeout, max 0.18 m/s and 0.45 rad/s, kp 0.6/1.2 and 0.03 m/rad deadbands; these match copied defaults at inspection. They do not establish tracking accuracy, obstacle response or network-loss stopping. |
+| Placeholder Git commands | `ROBOT_SOURCE` was set literally to `<actual package repository directory from the inventory>`; `git -C` failed because it does not exist. Check actual `src/...` directories or hash their trees if unversioned. |
+
 ## Observed package versions
 
 These are the report's installed versions, not tested dependency locks or a complete OS image. P04 must capture required native/firmware/Python dependencies and a reproducible package cache/image; the report's wildcard list alone is insufficient.
@@ -42,8 +59,8 @@ These are the report's installed versions, not tested dependency locks or a comp
 ## Reconciliation rules and outstanding evidence
 
 1. Summary says topic-info/echo/hz and dpkg/Python checks were skipped, and velocity publishers were not queried. Earlier detailed blocks show them. Use the detailed blocks as supplied observations; retain the contradictory summary for provenance, never call it a second confirming source.
-2. Git commands were run at `~/amr_robot`, the colcon workspace root. The failure there proves only that directory is not a Git worktree; packages in `~/amr_robot/src` may have their own repositories. Installed source location and commit remain unresolved. Do not initialize Git across the workspace or assume the Windows source equals the running overlay.
-3. No raw full `ros2 doctor`, node list or topic list is supplied, only narrative summaries for those commands. Treat reported Fast DDS/node inventory as reported evidence and refresh the missing raw artifacts in P01. The parameter/topic endpoint samples do contain detailed output.
+2. Initial Git commands ran at `~/amr_robot`; follow-up commands ran against a literal placeholder. Neither checked an actual package directory. Package **locations** are now known; Git state, source hashes/changes and launch provenance remain unresolved. Do not initialize Git across the workspace or assume Windows source equals the running overlay.
+3. The follow-up supplies raw `colcon list`, `/twist_mux`/`/diffbot` info, complete topic list and selected parameter dumps. Full `ros2 doctor` and `ros2 node list` remain narrative summaries. Treat Fast DDS as reported evidence. The detailed endpoint and parameter outputs are the stronger routing basis.
 4. CameraInfo and odometry timestamps are from separate command invocations; no time-synchronization measurement or clock uncertainty is supplied. Re-collect synchronized timing only when qualifying latency.
 5. No physical E-stop wiring, motor enable circuit, effective firmware timeout, Wi-Fi/browser-loss experiment, footprint/obstacle coverage, safe area, or operator/observer evidence is supplied. Unknown is not absent and is not verified. No motor-enabled qualification until its physical prerequisites are met.
 
@@ -53,8 +70,8 @@ Blueprint v1.0 is final as a construction plan. These gates block particular fut
 
 | Gate | Responsible role | Evidence to close it | Blocks |
 |---|---|---|---|
-| G1 Running baseline provenance | Junior / robot maintainer, P01 | Actual package directories and installed prefixes, source commit/hash and local changes, complete launch/service commands, source-vs-deployment diff, firmware sketch/binary/hash/baud and backup recovery procedure | P01 exit and hardware-specific changes |
-| G2 Camera/geometry configuration | Junior / maintainer, P01 then P07/P13 validation | camera_ros parameters/calibration path, physical camera orientation, marker dictionary + physical size, wheel/encoder config and survey | Metric marker-follow qualification and motion precision claims |
+| G1 Running baseline provenance | Junior / robot maintainer, P01 | **Known:** package locations and two installed prefixes. **Still required:** per-package Git state or source hashes/local modifications, launch/service commands, `diffbot_agent_pkg` and `serial_motor_demo*` code/dependency audit, source-vs-deployment diff, firmware sketch/binary/hash/baud and backup recovery | P01 exit and hardware-specific changes |
+| G2 Camera/geometry configuration | Junior / maintainer, P01 then P07/P13 validation | **Known:** camera_ros parameters and configured installed calibration URL; detector `DICT_7X7_50`/0.1 m and follower settings. **Still required:** source+installed calibration hash/content/mode match, physical camera orientation, printed marker dictionary/size, wheel/encoder survey | Metric marker-follow qualification and motion precision claims |
 | G3 Independent stop / electrical design | Maintainer + competent hardware reviewer, P05 | Nano/L298N wiring and supply review, independent motor-disable and deliberate reset, firmware timeout and fault evidence | Motor-enabled bench work until independent disable established; all floor work until P05/P06 gates |
 | G4 Obstacle sensing | Robot maintainer, P05b/P06 | Hardware survey, actual driver/topic/frame/range/rate, coverage/staleness/invalid-return behavior; restore existing device or select funded hardware if absent | Floor research and physical Test 1D; no auto-clear fallback or caption substitute |
 | G5 Area and measured stopping | Operator + separate observer, P13 | Area dimensions/conditions and assigned staff, passed bench gates, restricted commissioning measurements then frozen stopping/clearance thresholds | P13 A until prerequisites; general floor research until P13 B |
@@ -63,31 +80,26 @@ Blueprint v1.0 is final as a construction plan. These gates block particular fut
 
 ## Targeted follow-up for the junior
 
-Do not repeat the whole completed inventory. With the robot stationary and without launching/reconfiguring anything, capture the missing data below. Save errors as findings. All commands query current state; controller/firmware fault injection comes later.
+Do not repeat completed queries or the failed placeholder commands. With the robot stationary and without launching/reconfiguring anything, capture only missing data. Save errors as findings. These commands query state; controller/firmware fault injection comes later. Protect credentials if inspecting files.
 
 ```bash
-# Locate packages; failure at the workspace root does not establish package Git state.
-colcon list --base-paths "$HOME/amr_robot/src"
-ros2 pkg prefix robot_control_pkg
-ros2 pkg prefix aruco_follower
-ros2 pkg prefix camera_ros
-ros2 node info /diffbot
-ros2 node info /twist_mux
-ros2 topic list -t
-ros2 topic info -v /cmd_vel_emergency
-ros2 param dump /twist_mux
-ros2 param dump /camera
-ros2 param dump /aruco_detector
-ros2 param dump /marker_follower
+# These package paths came from colcon; no placeholder substitution is needed.
+git -C "$HOME/amr_robot/src/aruco_follower" status --short
+git -C "$HOME/amr_robot/src/aruco_follower" rev-parse HEAD
+git -C "$HOME/amr_robot/src/robot_control_pkg" status --short
+git -C "$HOME/amr_robot/src/robot_control_pkg" rev-parse HEAD
+git -C "$HOME/amr_robot/src/diffbot_agent_pkg" status --short
+git -C "$HOME/amr_robot/src/diffbot_agent_pkg" rev-parse HEAD
+git -C "$HOME/amr_robot/src/serial_motor_demo" status --short
+git -C "$HOME/amr_robot/src/serial_motor_demo" rev-parse HEAD
+ls -l "$HOME/amr_robot/install/robot_control_pkg/share/robot_control_pkg/config/camera_calibration.yaml"
+sha256sum "$HOME/amr_robot/install/robot_control_pkg/share/robot_control_pkg/config/camera_calibration.yaml"
+ros2 topic info -v /cmd_vel_llm
+ros2 topic info -v /cmd_vel_joy
+ros2 topic info -v /cmd_vel_nav_stamped
+ros2 topic info -v /camera/image_raw/compressed
+ros2 node info /web_target_commander
+ros2 param dump /diffbot
 ```
 
-Use the observed package source directory below; this placeholder is not a path to paste literally:
-
-```bash
-ROBOT_SOURCE='<actual package repository directory from the inventory>'
-git -C "$ROBOT_SOURCE" rev-parse --show-toplevel
-git -C "$ROBOT_SOURCE" status --short
-git -C "$ROBOT_SOURCE" rev-parse HEAD
-```
-
-Ask the maintainer for the exact startup/shutdown sequence and relevant nonsecret launch/configuration files, calibration file and firmware source/binary. Hash supplied files; retain modified-source diff if Git exists. Do not dump the commander's environment or credentials. Inspect physical sensor and E-stop hardware visually with the maintainer; do not disconnect Wi-Fi, flash firmware or test motion as an inventory shortcut.
+If a package is not a Git checkout, record no-Git for that package and preserve a source tree hash/backup; do not initialize it. Ask the maintainer for exact startup/shutdown steps and relevant nonsecret launch/config files, source calibration file, firmware source/binary and serial baud. Hash supplied files and retain modified-source diffs if Git exists. Inspect `diffbot_agent_pkg` for `/cmd_vel_llm` and any direct controller/serial path; inspect `serial_motor_demo*` to decide whether deployed or only example code. A package name does not answer this. Do not dump the commander's environment or credentials. Inspect physical sensor/E-stop hardware with the maintainer; do not disconnect Wi-Fi, flash firmware or test motion during inventory.

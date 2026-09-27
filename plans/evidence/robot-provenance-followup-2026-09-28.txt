@@ -1,0 +1,266 @@
+-- colcon list --base-paths "$HOME/amr_robot/src"
+aruco_follower	/home/pi/amr_robot/src/aruco_follower	(ros.ament_python)
+diffbot_agent	/home/pi/amr_robot/src/diffbot_agent_pkg	(ros.ament_python)
+robot_control_pkg	/home/pi/amr_robot/src/robot_control_pkg	(ros.ament_cmake)
+serial_motor_demo	/home/pi/amr_robot/src/serial_motor_demo/serial_motor_demo	(ros.ament_python)
+serial_motor_demo_msgs	/home/pi/amr_robot/src/serial_motor_demo/serial_motor_demo_msgs	(ros.ament_cmake)
+sim_pkg	/home/pi/amr_robot/src/sim_pkg	(ros.ament_python)
+twist_stamper	/home/pi/amr_robot/src/twist_stamper-main	(ros.ament_python)
+
+-- ros2 pkg prefix robot_control_pkg
+/home/pi/amr_robot/install/robot_control_pkg
+
+--ros2 pkg prefix aruco_follower
+/home/pi/amr_robot/install/aruco_follower
+
+--ros2 pkg prefix camera_ros
+/opt/ros/jazzy
+
+--ros2 node info /diffbot
+/diffbot
+  Subscribers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+  Publishers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+  Service Servers:
+    /diffbot/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /diffbot/get_logger_levels: rcl_interfaces/srv/GetLoggerLevels
+    /diffbot/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /diffbot/get_parameters: rcl_interfaces/srv/GetParameters
+    /diffbot/get_type_description: type_description_interfaces/srv/GetTypeDescription
+    /diffbot/list_parameters: rcl_interfaces/srv/ListParameters
+    /diffbot/set_logger_levels: rcl_interfaces/srv/SetLoggerLevels
+    /diffbot/set_parameters: rcl_interfaces/srv/SetParameters
+    /diffbot/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+  Service Clients:
+
+  Action Servers:
+
+  Action Clients:
+
+--ros2 node info /twist_mux
+/twist_mux
+  Subscribers:
+    /cmd_vel_emergency: geometry_msgs/msg/TwistStamped
+    /cmd_vel_joy: geometry_msgs/msg/TwistStamped
+    /cmd_vel_llm: geometry_msgs/msg/TwistStamped
+    /cmd_vel_nav_stamped: geometry_msgs/msg/TwistStamped
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+  Publishers:
+    /diagnostics: diagnostic_msgs/msg/DiagnosticArray
+    /diff_controller/cmd_vel: geometry_msgs/msg/TwistStamped
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+  Service Servers:
+    /twist_mux/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /twist_mux/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /twist_mux/get_parameters: rcl_interfaces/srv/GetParameters
+    /twist_mux/get_type_description: type_description_interfaces/srv/GetTypeDescription
+    /twist_mux/list_parameters: rcl_interfaces/srv/ListParameters
+    /twist_mux/set_parameters: rcl_interfaces/srv/SetParameters
+    /twist_mux/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+  Service Clients:
+
+  Action Servers:
+
+  Action Clients:
+
+--ros2 topic list -t
+/aruco/debug_image [sensor_msgs/msg/Image]
+/aruco/detected [std_msgs/msg/Bool]
+/aruco/distance [std_msgs/msg/Float32]
+/aruco/marker_pose [geometry_msgs/msg/PoseStamped]
+/aruco/target_marker_id [std_msgs/msg/Int32]
+/camera/camera_info [sensor_msgs/msg/CameraInfo]
+/camera/image_raw [sensor_msgs/msg/Image]
+/camera/image_raw/compressed [sensor_msgs/msg/CompressedImage]
+/cmd_vel_emergency [geometry_msgs/msg/TwistStamped]
+/cmd_vel_joy [geometry_msgs/msg/TwistStamped]
+/cmd_vel_llm [geometry_msgs/msg/TwistStamped]
+/cmd_vel_nav_stamped [geometry_msgs/msg/TwistStamped]
+/controller_manager/activity [controller_manager_msgs/msg/ControllerManagerActivity]
+/controller_manager/introspection_data/full [pal_statistics_msgs/msg/Statistics]
+/controller_manager/introspection_data/names [pal_statistics_msgs/msg/StatisticsNames]
+/controller_manager/introspection_data/values [pal_statistics_msgs/msg/StatisticsValues]
+/controller_manager/statistics/full [pal_statistics_msgs/msg/Statistics]
+/controller_manager/statistics/names [pal_statistics_msgs/msg/StatisticsNames]
+/controller_manager/statistics/values [pal_statistics_msgs/msg/StatisticsValues]
+/diagnostics [diagnostic_msgs/msg/DiagnosticArray]
+/diff_controller/cmd_vel [geometry_msgs/msg/TwistStamped]
+/diff_controller/odom [nav_msgs/msg/Odometry]
+/diff_controller/transition_event [lifecycle_msgs/msg/TransitionEvent]
+/dynamic_joint_states [control_msgs/msg/DynamicJointState]
+/joint_state_broadcaster/transition_event [lifecycle_msgs/msg/TransitionEvent]
+/joint_states [sensor_msgs/msg/JointState]
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/robot_description [std_msgs/msg/String]
+/rosout [rcl_interfaces/msg/Log]
+/tf [tf2_msgs/msg/TFMessage]
+/tf_static [tf2_msgs/msg/TFMessage]
+
+--ros2 topic info -v /cmd_vel_emergency
+Type: geometry_msgs/msg/TwistStamped
+
+Publisher count: 0
+
+Subscription count: 1
+
+Node name: twist_mux
+Node namespace: /
+Topic type: geometry_msgs/msg/TwistStamped
+Topic type hash: RIHS01_5f0fcd4f81d5d06ad9b4c4c63e3ea51b82d6ae4d0558f1d475229b1121db6f64
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.76.64.1f.0c.20.bd.00.00.00.00.00.00.14.04
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): UNKNOWN
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+
+--ros2 param dump /twist_mux
+/twist_mux:
+  ros__parameters:
+    diagnostic_updater:
+      period: 1.0
+      use_fqn: false
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+    start_type_description_service: true
+    topics:
+      emergency:
+        priority: 200
+        timeout: 0.5
+        topic: cmd_vel_emergency
+      joystick:
+        priority: 100
+        timeout: 0.5
+        topic: cmd_vel_joy
+      llm_agent:
+        priority: 50
+        timeout: 0.5
+        topic: cmd_vel_llm
+      navigation:
+        priority: 10
+        timeout: 0.5
+        topic: cmd_vel_nav_stamped
+    use_sim_time: false
+    use_stamped: true
+
+--ros2 param dump /camera
+/camera:
+  ros__parameters:
+    AeConstraintMode: 0
+    AeEnable: true
+    AeExposureMode: 0
+    AeFlickerMode: 0
+    AeFlickerPeriod: null
+    AeMeteringMode: 0
+    AfMetering: 0
+    AfMode: 0
+    AfPause: 0
+    AfRange: 0
+    AfSpeed: 0
+    AfTrigger: 0
+    AnalogueGain: 1.1228070259094238
+    AnalogueGainMode: 0
+    AwbEnable: null
+    AwbMode: 0
+    Brightness: 0.0
+    CnnEnableInputTensor: false
+    ColourCorrectionMatrix: null
+    ColourGains: null
+    ColourTemperature: null
+    Contrast: 1.0
+    ExposureTime: null
+    ExposureTimeMode: 0
+    ExposureValue: 0.0
+    FrameDurationLimits:
+    - 33333
+    - 33333
+    HdrMode: 0
+    LensPosition: 1.0
+    NoiseReductionMode: 0
+    Saturation: 1.0
+    ScalerCrop:
+    - 768
+    - 432
+    - 2304
+    - 1728
+    Sharpness: 1.0
+    StatsOutputEnable: false
+    SyncFrames: 1000
+    SyncMode: 0
+    camera: null
+    camera_info_url: file:///home/pi/amr_robot/install/robot_control_pkg/share/robot_control_pkg/config/camera_calibration.yaml
+    format: ''
+    frame_id: camera_link_optical
+    height: 480
+    jpeg_quality: 95
+    orientation: 0
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+    role: viewfinder
+    sensor_mode: ''
+    start_type_description_service: true
+    use_node_time: false
+    use_sim_time: false
+    width: 640
+
+--ros2 param dump /aruco_detector
+/aruco_detector:
+  ros__parameters:
+    aruco_dictionary: DICT_7X7_50
+    camera_info_topic: /camera/camera_info
+    image_topic: /camera/image_raw
+    marker_size: 0.1
+    publish_debug_image: true
+    start_type_description_service: true
+    target_marker_id: -1
+    use_sim_time: false
+
+--ros2 param dump /marker_follower
+/marker_follower:
+  ros__parameters:
+    cmd_frame_id: base_link
+    control_rate: 20.0
+    distance_deadband: 0.03
+    heading_deadband: 0.03
+    kp_angular: 1.2
+    kp_linear: 0.6
+    marker_timeout: 0.5
+    max_angular: 0.45
+    max_linear: 0.18
+    start_type_description_service: true
+    target_distance: 0.5
+    use_sim_time: false
+
+--ROBOT_SOURCE='<actual package repository directory from the inventory>'
+
+--git -C "$ROBOT_SOURCE" rev-parse --show-toplevel
+fatal: cannot change to '<actual package repository directory from the inventory>': No such file or directory
+
+--git -C "$ROBOT_SOURCE" status --short
+fatal: cannot change to '<actual package repository directory from the inventory>': No such file or directory
+
+--git -C "$ROBOT_SOURCE" rev-parse HEAD
+fatal: cannot change to '<actual package repository directory from the inventory>': No such file or directory
+
+
+
+
+
+
